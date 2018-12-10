@@ -1,6 +1,7 @@
 package pb
+
 import com.github.nscala_time.time.Imports._
-import jline.{TerminalFactory}
+import jline.TerminalFactory
 
 /** Output type format, indicate which format wil be used in
  *  the speed box.
@@ -15,14 +16,14 @@ import Units._
  *  to mock the tty in the tests(i.e: override `print(...)`)
  */
 trait Output {
-  def print(s: String) = Console.print(s)
+  def print(s: String): Unit = Console.print(s)
 }
 
 object ProgressBar {
   private val Format = "[=>-]"
 
   def kbFmt(n: Double): String = {
-    var kb = 1024
+    val kb = 1024
     n match {
       case x if x >= Math.pow(kb, 4) => "%.2f TB".format(x / Math.pow(kb, 4))
       case x if x >= Math.pow(kb, 3) => "%.2f GB".format(x / Math.pow(kb, 3))
@@ -37,9 +38,9 @@ object ProgressBar {
  *  create a new ProgressBar with default configuration.
  */
 class ProgressBar(_total: Int) extends Output {
-  val total = _total
+  val total: Int = _total
   var current = 0
-  private var startTime = DateTime.now
+  private val startTime = DateTime.now
   private var units = Units.Default
   private var barStart, barCurrent, barCurrentN, barRemain, barEnd = ""
   var isFinish = false
@@ -65,14 +66,14 @@ class ProgressBar(_total: Int) extends Output {
   /** Set Units size
    *  the default is simple numbers, but you can use Bytes type instead.
    */
-  def setUnits(u: Units) = units = u
+  def setUnits(u: Units): Unit = units = u
 
   /** Set custom format to the drawing bar, default is `[=>-]`
    */
   def format(fmt: String) {
     if (fmt.length >= 5) {
       val v = fmt.split("").toList
-      barStart = v(0)
+      barStart = v.head
       barCurrent = v(1)
       barCurrentN = v(2)
       barRemain = v(3)
@@ -81,11 +82,12 @@ class ProgressBar(_total: Int) extends Output {
   }
 
   private def draw() {
-    val width = TerminalFactory.get().getWidth()
+
+    val width: Int = 100
     var prefix, base, suffix = ""
     // percent box
     if (showPercent) {
-      var percent = current.toFloat / (total.toFloat / 100)
+      val percent: Float = current.toFloat / (total.toFloat / 100)
       suffix += " %.2f %% ".format(percent)
     }
     // speed box
